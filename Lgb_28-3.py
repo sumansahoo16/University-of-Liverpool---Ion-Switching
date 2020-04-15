@@ -372,20 +372,3 @@ y_pred_op = optimize_prediction(y_pred).astype(int)
 submission = pd.read_csv('/liverpool-ion-switching/sample_submission.csv')
 submission['open_channels'] = y_pred_op
 submission.to_csv('submission.csv', index=False, float_format='%.4f')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
