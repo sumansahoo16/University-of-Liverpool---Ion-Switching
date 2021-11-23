@@ -28,3 +28,39 @@ We noticed that drift is present in the beginning and in the end of the signal d
 
 WaveNet is superior at finding patterns in waveforms. Using dilated convolutions, it decomposes a signal into its different frequency sine waves just like the Fourier Transform.
 
+```
+def wave_block(x, filters, kernel_size, n):
+        dilation_rates = [2**i for i in range(n)]
+        x = Conv1D(filters = filters,
+                   kernel_size = 1,
+                   padding = 'same')(x)
+        res_x = x
+        for dilation_rate in dilation_rates:
+            tanh_out = Conv1D(filters = filters,
+                              kernel_size = kernel_size,
+                              padding = 'same', 
+                              activation = 'tanh', 
+                              dilation_rate = dilation_rate)(x)
+            sigm_out = Conv1D(filters = filters,
+                              kernel_size = kernel_size,
+                              padding = 'same',
+                              activation = 'sigmoid', 
+                              dilation_rate = dilation_rate)(x)
+            x = Multiply()([tanh_out, sigm_out])
+            x = Conv1D(filters = filters,
+                       kernel_size = 1,
+                       padding = 'same')(x)
+            res_x = Add()([res_x, x])
+        return res_x
+        
+        
+    inp = Input(shape = (shape_))
+    
+    x = wave_block(x, 16, 3, 12)
+    x = wave_block(x, 32, 3, 8)
+    x = wave_block(x, 64, 3, 4)
+    x = wave_block(x, 128, 3, 1)
+    
+    out = Dense(11, activation = 'softmax', name = 'out')(x)
+```
+
